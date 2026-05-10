@@ -1,0 +1,124 @@
+:root {
+  --bg-beverages: rgba(254, 232, 176, 0.3);
+  --bg-breakFast: rgba(254, 232, 176, 0.3);
+  --bg-bakery: rgba(254, 232, 176, 0.3);
+  --bg-iceCreams: rgba(254, 232, 176, 0.3);
+  --bg-home: rgba(254, 232, 176, 1);
+}
+.catContainer {
+  background: green;
+  display: flex;
+  align-items: center;
+  height: 70px;
+}
+
+.catContainer img {
+  position: absolute;
+  width: 120px;
+  max-height: 120px;
+  border-radius: 100%;
+  top: 0;
+}
+
+.left img {
+  left: 0;
+}
+
+.loadingSpin {
+  width: 100%;
+  height: 100%;
+
+  background-color: #333333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.right img {
+  right: 0;
+}
+.boxContainer {
+  height: 120px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 1rem 0;
+}
+
+main {
+  height: 100%;
+}
+
+.left {
+  justify-content: flex-end;
+}
+
+.right {
+  justify-content: flex-start;
+}
+
+header {
+  width: 100%;
+}
+.menuHeader {
+  background: crimson;
+  padding: 1rem;
+}
+
+.homeHeader {
+  background: var(--bg-home);
+  padding: 1rem;
+}
+
+.homeHeader nav ul {
+  font-size: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  list-style: none;
+}
+
+.action {
+  padding: 0 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+}
+
+.bakery {
+  background: var(--bg-bakery);
+}
+
+.beverages {
+  background: var(--bg-beverages);
+}
+
+.icecreams {
+  background: var(--bg-bakery);
+}
+
+.breakfasts {
+  background: var(--bg-breakFast);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+a,
+button {
+  outline: none;
+  cursor: pointer;
+}
+button:active,
+a:active {
+  -webkit-tap-highlight-color: transparent;
+}

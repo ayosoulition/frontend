@@ -1,0 +1,11 @@
+.ticketThanks {
+  padding: 1rem;
+}
+
+.ticketThanks h1 {
+  text-align: center;
+}
+
+.ticketThanks .thanksText {
+  padding: 2rem;
+}

@@ -1,0 +1,23 @@
+@import url("https://fonts.googleapis.com/css2?family=Bangers&family=Noto+Sans+Buhid&family=Oleo+Script&family=Oleo+Script+Swash+Caps&display=swap");
+
+:root {
+  --box-shadow: 0 0 0.6rem rgba(0, 0, 0, 0.2);
+}
+
+#root {
+  /* display: flex; */
+  /* justify-content: center; */
+  /* align-items: center; */
+  height: 100%;
+}
+
+* {
+  font-family: "Oleo Script Swash Caps", cursive;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  height: 100vh;
+}

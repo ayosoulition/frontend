@@ -1,0 +1,46 @@
+.loginPage {
+  background-color: gray;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.loginMain {
+  width: 90%;
+  margin: 100px auto;
+}
+
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  background-color: coral;
+
+  padding: 1.5rem;
+  border-radius: 20px;
+}
+
+.loginForm div {
+  display: flex;
+  flex-direction: column;
+}
+.formUserName {
+  padding: 0.5rem 0;
+}
+
+.loginForm input {
+  padding: 0.5rem 0;
+  border: none;
+  outline: none;
+  border-radius: 10px;
+  padding-left: 0.3rem;
+  font-size: 1.5rem;
+}
+
+.loginForm button {
+  display: block;
+  margin: 2rem auto 0 auto;
+  padding: 0.5rem 5rem;
+  border-radius: 15px;
+  border: none;
+  outline: none;
+}

@@ -1,0 +1,226 @@
+.wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-height: 800px;
+}
+
+.wrapper {
+  padding: 2rem;
+}
+
+.mainColor {
+  color: crimson;
+}
+
+.cover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: crimson;
+  border-top-left-radius: 0.6rem;
+  border-bottom-left-radius: 0.6rem;
+  transform-origin: right;
+  box-shadow: var(--box-shadow);
+}
+
+.cover.cover-left {
+  z-index: -1;
+}
+
+.back-first {
+  color: white;
+  position: absolute;
+  top: 50%;
+  right: 0;
+  font-size: 3rem;
+  z-index: 1;
+  cursor: pointer;
+}
+
+.cover.cover-right.turn {
+  transform: rotateY(180deg);
+}
+
+.book {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  perspective: 250rem;
+}
+
+.book .book-page {
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  background: white;
+  box-shadow: 0 0 0.6rem rgba(0, 0, 0, 0.1);
+}
+
+.book-page.page-right {
+  position: absolute;
+  right: 0;
+  transform-style: preserve-3d;
+  transform-origin: left;
+  transition: transform 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+.book-page.page-left {
+  padding: 0 0.5rem;
+}
+.book-page.page-left {
+  /* display: flex; */
+  /* text-align: center; */
+  /* flex-direction: column; */
+  overflow-y: scroll;
+}
+
+h1 {
+  font-size: 1.5rem;
+}
+
+.ticket {
+  padding: 0.5rem 0;
+}
+
+.ticket h2 {
+  padding-bottom: 0.5rem;
+}
+
+.item span {
+  padding: 0 0.2rem;
+}
+
+.item {
+  position: relative;
+  padding: 1.5rem 0 0.5rem 0;
+  border-top: solid 1px black;
+}
+
+.itemQt {
+  color: white;
+  background: crimson;
+  position: absolute;
+  top: 5px;
+  right: 0;
+  border-top-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.total {
+  font-weight: bold;
+  padding-bottom: 1rem;
+}
+.total div {
+  padding-top: 1rem;
+}
+
+.book-page.page-right.turn {
+  transform: rotateY(-180deg);
+}
+
+.book-page .page-front,
+.book-page .page-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.menuHeader {
+  background: crimson;
+  padding: 1rem;
+}
+
+.menuHeader nav ul {
+  font-size: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  list-style: none;
+}
+
+.menuPage {
+  width: 100%;
+  height: 100%;
+}
+
+.menu {
+  margin-top: 1rem;
+}
+.book-page .page-front {
+  transform: rotateY(0deg) translateZ(1px);
+}
+
+.book-page .page-back {
+  transform: rotateY(180deg) translateZ(1px);
+}
+
+.nextprev-btn {
+  position: absolute;
+  bottom: 0.9rem;
+  width: 2rem;
+  height: 2rem;
+  cursor: pointer;
+  font-size: 2rem;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  background: crimson;
+  color: white;
+}
+
+.nextprev-btn-front {
+  right: 0.5rem;
+}
+
+.nextprev-btn-back {
+  left: 0.5rem;
+}
+
+.headerBtn {
+  width: 2rem;
+  height: 2rem;
+  color: black;
+}
+
+.price {
+  font-size: 1.5rem;
+}
+
+@media (max-width: 900px) {
+  .wrapper {
+    position: relative;
+    width: 99%;
+    max-height: 500px;
+    height: 80vh;
+    padding: 0.5rem;
+  }
+}
+
+.sendOrder {
+  background: crimson;
+  color: white;
+  font-weight: bold;
+  padding: 0.5rem 4rem;
+  font-size: 1rem;
+  border-radius: 22px;
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+.browse p {
+  padding-top: 2rem;
+  font-size: 1.2rem;
+}
+
+.confirmOrder {
+}
