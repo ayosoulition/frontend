@@ -17,7 +17,7 @@ export default function Order({ tableNumber, order, setOrder }) {
       data.push([item]);
     });
   });
-  console.log(data);
+  console.log("Data:", data);
   return (
     <Book
       data={data}

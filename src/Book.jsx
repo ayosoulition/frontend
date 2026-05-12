@@ -9,6 +9,7 @@ export default function Book({ data, tableNumber, order, setOrder, bookType }) {
   const [page, setPage] = useState({ pageNum: null });
   const id = useId();
   const pagesRefs = useRef([]);
+  const buttonBack = useRef(null);
   function handleNext(pageNum) {
     setPage({ pageNum });
   }
@@ -30,7 +31,9 @@ export default function Book({ data, tableNumber, order, setOrder, bookType }) {
         pageTurn.classList.remove("turn");
 
         setTimeout(() => {
-          pageTurn.style.zIndex = baseIndex - pageNum * 100;
+          // pageTurn.style.zIndex = baseIndex - pageNum * 100;
+          pageTurn.style.zIndex = baseIndex - pageNum;
+          // buttonBack.current.style.zIndex =
           if (pageNum === 0) {
             setPage({ pageNum: null });
           }
@@ -39,7 +42,8 @@ export default function Book({ data, tableNumber, order, setOrder, bookType }) {
         pageTurn.classList.add("turn");
 
         setTimeout(() => {
-          pageTurn.style.zIndex = baseIndex + pageNum * 100;
+          // pageTurn.style.zIndex = baseIndex + pageNum * 100;
+          pageTurn.style.zIndex = baseIndex + pageNum;
 
           if (pageNum === 0) {
             setPage({ pageNum: null });
@@ -75,7 +79,11 @@ export default function Book({ data, tableNumber, order, setOrder, bookType }) {
 
           <div className="book">
             {data.length > 0 ? (
-              <span className="back-first" onClick={handleBack}>
+              <span
+                className="back-first"
+                ref={buttonBack}
+                onClick={handleBack}
+              >
                 <i className="bx bxs-left-arrow"></i>
               </span>
             ) : null}

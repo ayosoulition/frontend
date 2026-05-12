@@ -6,7 +6,7 @@ import Lottie from "react-lottie";
 
 import animation from "../public/assets/loadingSpinner.json";
 
-export default function Home({ tableNumber, loading }) {
+export default function Home({ tableNumber, loading, categories }) {
   const lottieOptions = {
     loop: true, // Set to true for infinite loop
     autoplay: true, // Autoplay the animation
@@ -28,61 +28,23 @@ export default function Home({ tableNumber, loading }) {
     <>
       <Header tableNumber={tableNumber} className="homeHeader" />
       <main>
-        <div className="boxContainer">
-          <Link to="./beverages">
-            <div className="catContainer beverages left">
-              <img src="assets/coffeback.jpg" alt="" />
-              <div className="action">
-                <h2>Beverages</h2>
-                <span className="action-btn">
-                  <i className="bx bxs-book-bookmark btn" id="btn"></i>
-                </span>
-              </div>
+        {categories.map((categorie) => {
+          return (
+            <div className="boxContainer" key={categorie}>
+              <Link to={`/${categorie}`}>
+                <div className={`catContainer bakery left`}>
+                  <img src={`assets/${categorie}.jpg`} alt="" />
+                  <div className="action">
+                    <h2>{categorie.toUpperCase()}</h2>
+                    <span className="action-btn">
+                      <i className="bx bxs-book-bookmark btn" id="btn"></i>
+                    </span>
+                  </div>
+                </div>
+              </Link>
             </div>
-          </Link>
-        </div>
-
-        <div className="boxContainer">
-          <Link to="./bakery">
-            <div className="catContainer bakery right">
-              <img src="assets/bakery.jpg" alt="" />
-              <div className="action">
-                <span className="action-btn">
-                  <i className="bx bxs-book-bookmark btn" id="btn"></i>
-                </span>
-                <h2>Bakery</h2>
-              </div>
-            </div>
-          </Link>
-        </div>
-
-        <div className="boxContainer">
-          <Link to="./icecreams">
-            <div className="catContainer icecreams left">
-              <img src="assets/icecreams.jpg" alt="" />
-              <div className="action">
-                <h2>IceCreams</h2>
-                <span className="action-btn">
-                  <i className="bx bxs-book-bookmark btn" id="btn"></i>
-                </span>
-              </div>
-            </div>
-          </Link>
-        </div>
-
-        <div className="boxContainer">
-          <Link to="./breakfasts">
-            <div className="catContainer breakfasts right">
-              <img src="assets/break.jpg" alt="" />
-              <div className="action">
-                <span className="action-btn">
-                  <i className="bx bxs-book-bookmark btn" id="btn"></i>
-                </span>
-                <h2>BreakFasts</h2>
-              </div>
-            </div>
-          </Link>
-        </div>
+          );
+        })}
       </main>
     </>
   );

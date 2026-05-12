@@ -32,12 +32,12 @@
 }
 
 .back-first {
-  color: white;
+  color: red;
   position: absolute;
   top: 50%;
   right: 0;
   font-size: 3rem;
-  z-index: 1;
+  z-index: 0;
   cursor: pointer;
 }
 

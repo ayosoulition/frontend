@@ -1,6 +1,6 @@
 import Thanks from "./Thanks";
 
-export default function Ticket({ order, children, ticketType }) {
+export default function Ticket({ order, children, ticketType, timestamp }) {
   const keys = Object.keys(order);
 
   let total = 0;
@@ -31,6 +31,8 @@ export default function Ticket({ order, children, ticketType }) {
                 Thanks for your order! Heres your ticket. We will serve you as
                 soon as possible. Thanks for your time!
               </p>
+
+              <p>{timestamp}</p>
             </>
           )}
           {keys.map((category) => (
