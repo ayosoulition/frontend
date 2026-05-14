@@ -11,7 +11,7 @@ function Paper(
       {items.map((item, index) => {
         return (
           <Page
-            key={`${id}-${item.id}`}
+            key={`${id}-${item?.id}`}
             order={order}
             setOrder={setOrder}
             pageDir={index === 0 ? "front" : "back"}

@@ -14,9 +14,11 @@ export default function Order({ tableNumber, order, setOrder }) {
 
   Object.keys(order).forEach((o) => {
     order[o].forEach((item) => {
-      data.push([item]);
+      data.push([item, null]);
     });
   });
+
+  console.log("Heythis is", data);
   console.log("Data:", data);
   return (
     <Book

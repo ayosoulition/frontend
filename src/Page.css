@@ -26,8 +26,12 @@
   object-fit: cover;
 }
 
-.page {
-  background: white;
+.page .page {
+  background-color: red;
+  background-image: url("../public/assets/backgroundPaper.png");
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
 }
 .info {
   width: 100%;
