@@ -1,0 +1,40 @@
+{orders.map((tableOrder, index) => (
+          <div className="orderCard" key={index
+    }>
+            <h2>Table {tableOrder.tableNumber
+    }</h2>
+
+            {Object.entries(tableOrder.order).map(([category, items
+        ]) => (
+              <div className="categorySection" key={category
+        }>
+                <h3>{category
+        }</h3>
+
+                {items.map((item) => (
+                  <div className="itemCard" key={item.id
+            }>
+                    <img src={`assets/${item.img
+                }`
+            } alt={item.title
+            } />
+
+                    <div>
+                      <h4>{item.title
+            }</h4>
+
+                      <p>Quantité : {item.qt
+            }</p>
+
+                      <p>Prix : {item.price
+            } DH</p>
+                    </div>
+                  </div>
+                ))
+        }
+              </div>
+            ))
+    }
+          </div>
+        ))
+}

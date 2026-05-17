@@ -18,8 +18,6 @@ export default function Order({ tableNumber, order, setOrder }) {
     });
   });
 
-  console.log("Heythis is", data);
-  console.log("Data:", data);
   return (
     <Book
       data={data}

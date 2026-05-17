@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useId } from "react";
+import { useNavigate } from "react-router-dom";
 import Paper from "./Paper";
 import Ticket from "./Ticket";
 import "./Book.css";
@@ -7,12 +8,15 @@ import Header from "./Header";
 
 export default function Book({ data, tableNumber, order, setOrder, bookType }) {
   const [page, setPage] = useState({ pageNum: null });
+  const navigate = useNavigate();
   const id = useId();
   const pagesRefs = useRef([]);
   const buttonBack = useRef(null);
   function handleNext(pageNum) {
     setPage({ pageNum });
   }
+
+  console.log("Lokmane Order", order);
 
   const setPagesRefs = (el, index) => {
     pagesRefs.current[index] = el;
@@ -53,6 +57,39 @@ export default function Book({ data, tableNumber, order, setOrder, bookType }) {
     }
   }, [page]);
 
+  async function sendOrder() {
+    let finalOrder = {
+      tableNumber: tableNumber,
+      order: order,
+    };
+    try {
+      const response = await fetch("http://localhost:3005/orders", {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify(finalOrder),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        navigate("/thanks", {
+          replace: true,
+        });
+      } else {
+        console.log(data);
+
+        alert("Erreur commande");
+      }
+    } catch (error) {
+      console.log(error);
+
+      alert("Erreur serveur");
+    }
+  }
   function handleBack() {
     let pages = pagesRefs.current;
 
@@ -123,10 +160,8 @@ export default function Book({ data, tableNumber, order, setOrder, bookType }) {
             </div>
           ) : null
         ) : (
-          <div className="actionBtn">
-            <Link to="/thanks" replace>
-              <span className="sendOrder">Confirm</span>
-            </Link>
+          <div className="actionBtn" onClick={sendOrder}>
+            <span className="sendOrder">Confirm</span>
           </div>
         )}
       </main>

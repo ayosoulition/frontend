@@ -15,6 +15,7 @@ import Book from "./Book.jsx";
 import Order from "./Order.jsx";
 import Thanks from "./Thanks.jsx";
 import Login from "./Login.jsx";
+import Serveur from "./Serveur.jsx";
 import Register from "./Register.jsx";
 import AdminPage from "./AdminPage.jsx";
 
@@ -100,6 +101,7 @@ export default function App() {
             />
           }
         />
+        <Route path="/serveur" element={<Serveur />} />
 
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
