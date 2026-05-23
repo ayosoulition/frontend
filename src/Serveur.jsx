@@ -138,6 +138,10 @@ export default function Serveur() {
         },
       }));
 
+      if (action === "paid") {
+        handleCancel(selectedTable);
+      }
+
       setSelectedTable(null);
     } catch (err) {
       console.error(err);
@@ -186,7 +190,15 @@ export default function Serveur() {
   const filteredTables = Object.keys(tables).filter((tableId) => {
     const table = tables[tableId];
 
-    const matchStatus = statusFilter === "all" || table.status === statusFilter;
+    // const matchStatus = statusFilter === "all" || table.status === statusFilter;
+
+    let matchStatus;
+
+    if (table.status === "empty") {
+      matchStatus = false;
+    } else {
+      matchStatus = statusFilter === "all" || table.status === statusFilter;
+    }
 
     const matchSearch = tableId.toString().includes(searchTable.trim());
 
