@@ -9,3 +9,47 @@
 .ticketThanks .thanksText {
   padding: 2rem;
 }
+
+.pay {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+.payBtn {
+  width: 50%;
+  padding: 14px 16px;
+  border: none;
+  border-radius: 16px;
+  background-color: #dc143c;
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(239, 68, 68, 0.25);
+  transition: all 0.2s ease;
+}
+
+/* Active Hover effects */
+.payBtn:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(239, 68, 68, 0.35);
+}
+
+/* Active Press effect */
+.payBtn:not(:disabled):active {
+  transform: scale(0.98);
+}
+
+/* Inactive/Disabled Styles */
+.payBtn:disabled {
+  background-color: #9ca3af; /* Gray tint color */
+  color: #e5e7eb;
+  cursor: not-allowed; /* Changes the cursor to a block symbol */
+  box-shadow: none; /* Removes glow effect when unavailable */
+  opacity: 0.6; /* Makes it visually distinct and muted */
+  transform: none; /* Prevents moving on hover */
+}

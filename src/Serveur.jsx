@@ -1,229 +1,471 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { io } from "socket.io-client";
 import "./Serveur.css";
 
-export default function Serveur() {
-  const socket = io("http://localhost:3005");
+const API_BASE_URL = "http://192.168.0.189:3005";
+const socket = io(API_BASE_URL);
 
+export default function Serveur() {
+  const [tables, setTables] = useState({});
   const [selectedTable, setSelectedTable] = useState(null);
-  // Sample table data with extended information
   const [orders, setOrders] = useState({});
 
-  useEffect(() => {
-    socket.on("new-order", (incomingOrders) => {
-      console.log("Received new orders:", incomingOrders);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [searchTable, setSearchTable] = useState("");
 
-      setOrders(incomingOrders);
+  const notificationSoundRef = useRef(null);
+  const prevTablesRef = useRef({});
+
+  // =========================
+  // INIT SOUND
+  // =========================
+  useEffect(() => {
+    const sound = new Audio("/assets/notif.wav");
+    sound.preload = "auto";
+    sound.load();
+
+    notificationSoundRef.current = sound;
+
+    const unlockAudio = () => {
+      const s = notificationSoundRef.current;
+      if (!s) return;
+
+      s.play()
+        .then(() => {
+          s.pause();
+          s.currentTime = 0;
+        })
+        .catch(() => {});
+    };
+
+    window.addEventListener("click", unlockAudio, { once: true });
+
+    return () => {
+      window.removeEventListener("click", unlockAudio);
+    };
+  }, []);
+
+  const playSound = () => {
+    const sound = notificationSoundRef.current;
+    if (!sound) return;
+
+    sound.currentTime = 0;
+    sound.play().catch(() => {});
+  };
+
+  // =========================
+  // SOCKETS (FIXED)
+  // =========================
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/orders`)
+      .then((res) => res.json())
+      .then(setOrders);
+
+    fetch(`${API_BASE_URL}/tables`)
+      .then((res) => res.json())
+      .then(setTables);
+
+    socket.on("tables-update", (newTables) => {
+      const prevTables = prevTablesRef.current;
+
+      const importantStatuses = new Set(["ordered", "bill"]);
+
+      let shouldPlaySound = false;
+
+      for (const tableId in newTables) {
+        const next = newTables[tableId];
+        const prev = prevTables?.[tableId];
+
+        if (!prev) continue;
+
+        if (prev.status !== next.status && importantStatuses.has(next.status)) {
+          shouldPlaySound = true;
+          break;
+        }
+      }
+
+      if (shouldPlaySound) playSound();
+
+      // FIX: stable deep copy
+      prevTablesRef.current = JSON.parse(JSON.stringify(newTables));
+
+      setTables(newTables);
+    });
+
+    socket.on("new-order", (data) => {
+      setOrders(data);
+      playSound();
     });
 
     return () => {
+      socket.off("tables-update");
       socket.off("new-order");
     };
   }, []);
 
-  const handleTableClick = (table) => {
-    console.log(table);
-    console.log(orders);
-    setSelectedTable(table.number); // This sets the data and serves as the trigger to open the modal
+  // =========================
+  // API CALL
+  // =========================
+  const updateTableStatus = async (tableId, action) => {
+    return fetch(`${API_BASE_URL}/tables/${tableId}/status`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action }),
+    });
   };
 
-  // 3. Function to close the modal
-  const closeModal = () => {
-    setSelectedTable(null);
+  // =========================
+  // ACTION HANDLER (FIXED LOGIC)
+  // =========================
+  const handleActionAndClose = async (action) => {
+    if (!selectedTable) return;
+
+    try {
+      await updateTableStatus(selectedTable, action);
+
+      setTables((prev) => ({
+        ...prev,
+        [selectedTable]: {
+          ...prev[selectedTable],
+          status:
+            action === "confirm"
+              ? "confirmed"
+              : action === "served"
+                ? "notPayed" // ✅ FIXED
+                : action === "paid"
+                  ? "empty"
+                  : prev[selectedTable]?.status,
+        },
+      }));
+
+      setSelectedTable(null);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const tables = [
-    {
-      id: 1,
-      number: "1",
-      status: "confirmed",
-    },
-    {
-      id: 2,
-      number: "2",
-      status: "empty",
-    },
-    {
-      id: 3,
-      number: "3",
-      status: "confirmed",
-    },
-    {
-      id: 4,
-      number: "4",
-      status: "ordered",
-    },
-    {
-      id: 5,
-      number: "5",
-      status: "bill",
-    },
-    {
-      id: 6,
-      number: "6",
-      status: "empty",
-    },
-    {
-      id: 7,
-      number: "7",
-      status: "confirmed",
-    },
-    {
-      id: 8,
-      number: "8",
-      status: "ordered",
-    },
-    {
-      id: 9,
-      number: "9",
-      status: "bill",
-    },
-    {
-      id: 10,
-      number: "10",
-      status: "notPayed",
-    },
-    {
-      id: 11,
-      number: "11",
-      status: "confirmed",
-    },
-    {
-      id: 12,
-      number: "12",
-      status: "empty",
-    },
-  ];
+  // =========================
+  // CANCEL
+  // =========================
+  const handleCancel = async (tableId) => {
+    try {
+      await updateTableStatus(tableId, "cancel");
+
+      setOrders((prev) => {
+        const copy = { ...prev };
+        delete copy[tableId];
+        return copy;
+      });
+
+      setTables((prev) => ({
+        ...prev,
+        [tableId]: { ...prev[tableId], status: "empty" },
+      }));
+
+      setSelectedTable(null);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const getStatusLabel = (status) => {
     const labels = {
       empty: "Libre",
       ordered: "Commande",
-      confirmed: "En cours",
+      confirmed: "Confirmée",
       notPayed: "Non payée",
       bill: "Addition",
     };
     return labels[status] || status;
   };
+
+  const closeModal = () => setSelectedTable(null);
+
+  const selectedStatus = tables[selectedTable]?.status;
+
+  const filteredTables = Object.keys(tables).filter((tableId) => {
+    const table = tables[tableId];
+
+    const matchStatus = statusFilter === "all" || table.status === statusFilter;
+
+    const matchSearch = tableId.toString().includes(searchTable.trim());
+
+    return matchStatus && matchSearch;
+  });
+
   return (
     <div className="dashboard-container">
-      {/* Red Header */}
       <header className="app-header">
         <div className="app-logo">Serveur Interface</div>
+
         <nav className="header-nav">
-          <button className="nav-link active">
-            <span className="nav-icon">🍽️</span> Tables
-          </button>
-
-          <button className="nav-link">
-            <span className="nav-icon">📋</span> Commandes
-          </button>
-
-          <button className="nav-link">
-            <span className="nav-icon">📜</span> Historique
-          </button>
+          <button className="nav-link active">🍽️ Tables</button>
+          <button className="nav-link">📋 Commandes</button>
+          <button className="nav-link">📜 Historique</button>
         </nav>
       </header>
 
       <main className="main-content">
-        {/* Statistics Section */}
+        {/* FILTER */}
+        <div style={filterBar}>
+          <input
+            type="text"
+            placeholder="🔢 Table number..."
+            value={searchTable}
+            onChange={(e) => setSearchTable(e.target.value)}
+            style={searchInput}
+          />
 
-        {/* Filter Bar */}
+          <div style={filterButtons}>
+            <button
+              onClick={() => setStatusFilter("all")}
+              style={statusFilter === "all" ? activeBtn : btn}
+            >
+              All
+            </button>
+            <button
+              onClick={() => setStatusFilter("ordered")}
+              style={statusFilter === "ordered" ? activeBtn : btn}
+            >
+              Commande
+            </button>
+            <button
+              onClick={() => setStatusFilter("confirmed")}
+              style={statusFilter === "confirmed" ? activeBtn : btn}
+            >
+              Confirmée
+            </button>
+            <button
+              onClick={() => setStatusFilter("bill")}
+              style={statusFilter === "bill" ? activeBtn : btn}
+            >
+              Addition
+            </button>
+            <button
+              onClick={() => setStatusFilter("notPayed")}
+              style={statusFilter === "notPayed" ? activeBtn : btn}
+            >
+              Non payée
+            </button>
+          </div>
+        </div>
 
-        {/* Table Grid */}
+        {/* TABLES */}
         <section className="tables-grid">
-          {tables.map((table) => (
+          {filteredTables.map((table) => (
             <div
-              key={table.id}
-              onClick={() => {
-                handleTableClick(table);
-              }}
-              className={`table-card status-${table.status}`}
+              key={table}
+              onClick={() => setSelectedTable(table)}
+              className={`table-card status-${tables[table].status}`}
             >
               <div className="table-card-header">
-                {getStatusLabel(table.status)}
+                {getStatusLabel(tables[table].status)}
               </div>
               <div className="table-card-body">
-                <div className="table-number">{table.number}</div>
-                <div className="table-details">
-                  <div className="table-detail-row">
-                    <span>{table.time}</span>
-                  </div>
-                </div>
+                <div className="table-number">{table}</div>
               </div>
             </div>
           ))}
+        </section>
+      </main>
 
-          {selectedTable && (
-            <div style={modalOverlayStyle}>
-              <div style={modalContentStyle}>
-                <h3>Details for {selectedTable}</h3>
-                <hr />
-                <p>
-                  <strong>Current Order:</strong>
-                </p>
+      {/* MODAL */}
+      {selectedTable && (
+        <div style={modalOverlay} onClick={closeModal}>
+          <div style={modalBox} onClick={(e) => e.stopPropagation()}>
+            <div style={modalHeader}>
+              <h3>Table {selectedTable}</h3>
+              <button style={closeBtn} onClick={closeModal}>
+                ✕
+              </button>
+            </div>
 
-                {console.log(orders)}
-                {Object.entries(orders[selectedTable].order).map(
-                  ([category, items]) => (
-                    <div className="categorySection" key={category}>
-                      <h3>{category}</h3>
+            <div style={modalBody}>
+              {orders[selectedTable]?.order ? (
+                Object.entries(orders[selectedTable].order).map(
+                  ([cat, items]) => (
+                    <div key={cat} style={{ marginBottom: 15 }}>
+                      <h4 style={{ marginBottom: 8 }}>{cat}</h4>
 
                       {items.map((item) => (
-                        <div className="itemCard" key={item.id}>
-                          <img src={`assets/${item.img}`} alt={item.title} />
-
+                        <div key={item.id} style={itemCard}>
+                          <img
+                            src={`assets/${item.img}`}
+                            style={imgStyle}
+                            alt={item.title}
+                          />
                           <div>
-                            <h4>{item.title}</h4>
-
-                            <p>Quantité : {item.qt}</p>
-
-                            <p>Prix : {item.price} DH</p>
+                            <div style={{ fontWeight: 600 }}>{item.title}</div>
+                            <div style={smallText}>Qty: {item.qt}</div>
+                            <div style={smallText}>{item.price} DH</div>
                           </div>
                         </div>
                       ))}
                     </div>
                   ),
+                )
+              ) : (
+                <p style={{ color: "#666" }}>No order for this table</p>
+              )}
+
+              <div style={btnContainer}>
+                {selectedStatus === "ordered" && (
+                  <>
+                    <button
+                      style={confirmBtn}
+                      onClick={() => handleActionAndClose("confirm")}
+                    >
+                      Confirm
+                    </button>
+
+                    <button
+                      style={cancelBtn}
+                      onClick={() => handleCancel(selectedTable)}
+                    >
+                      Cancel
+                    </button>
+                  </>
                 )}
-                <button onClick={closeModal} style={closeButtonStyle}>
-                  Close
-                </button>
+
+                {selectedStatus === "confirmed" && (
+                  <button
+                    style={servedBtn}
+                    onClick={() => handleActionAndClose("served")}
+                  >
+                    Served
+                  </button>
+                )}
+
+                {(selectedStatus === "bill" ||
+                  selectedStatus === "notPayed") && (
+                  <button
+                    style={paidBtn}
+                    onClick={() => handleActionAndClose("paid")}
+                  >
+                    Paid ✔
+                  </button>
+                )}
               </div>
             </div>
-          )}
-        </section>
-      </main>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-const modalOverlayStyle = {
+/* ================= STYLES (UNCHANGED) ================= */
+
+const filterBar = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 10,
+  marginBottom: 15,
+};
+const searchInput = {
+  padding: 10,
+  borderRadius: 10,
+  border: "1px solid #ddd",
+};
+const filterButtons = {
+  display: "flex",
+  gap: 8,
+  flexWrap: "wrap",
+};
+
+const btn = {
+  padding: "6px 10px",
+  border: "1px solid #ddd",
+  borderRadius: 8,
+  background: "#fff",
+  fontSize: 12,
+};
+const activeBtn = {
+  padding: "6px 10px",
+  border: "1px solid #22c55e",
+  borderRadius: 8,
+  background: "#22c55e",
+  color: "#fff",
+  fontSize: 12,
+};
+
+const modalOverlay = {
   position: "fixed",
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  backgroundColor: "rgba(0, 0, 0, 0.5)",
+  inset: 0,
+  background: "rgba(0,0,0,0.6)",
   display: "flex",
   justifyContent: "center",
-  alignItems: "center",
+  alignItems: "flex-end",
+  padding: 10,
   zIndex: 1000,
 };
-
-const modalContentStyle = {
-  backgroundColor: "#fff",
-  padding: "30px",
-  borderRadius: "8px",
-  minWidth: "300px",
-  boxShadow: "0px 4px 10px rgba(0,0,0,0.25)",
+const modalBox = {
+  background: "#fff",
+  width: "100%",
+  maxWidth: 520,
+  maxHeight: "85vh",
+  borderRadius: "20px 20px 14px 14px",
+  display: "flex",
+  flexDirection: "column",
+  overflow: "hidden",
 };
-
-const closeButtonStyle = {
-  marginTop: "15px",
-  padding: "8px 16px",
-  backgroundColor: "#ff4d4d",
+const modalHeader = {
+  padding: 14,
+  borderBottom: "1px solid #eee",
+  display: "flex",
+  justifyContent: "space-between",
+};
+const modalBody = { padding: 14, overflowY: "auto", flex: 1 };
+const closeBtn = {
+  background: "#ef4444",
   color: "#fff",
   border: "none",
-  borderRadius: "4px",
-  cursor: "pointer",
+  padding: "6px 10px",
+  borderRadius: 8,
+};
+
+const itemCard = {
+  display: "flex",
+  gap: 10,
+  padding: 10,
+  background: "#f8fafc",
+  borderRadius: 12,
+  marginBottom: 8,
+};
+const imgStyle = { width: 50, height: 50, borderRadius: 10 };
+const smallText = { fontSize: 12, color: "#666" };
+
+const btnContainer = { display: "flex", gap: 10, marginTop: 15 };
+const confirmBtn = {
+  flex: 1,
+  padding: 10,
+  background: "#22c55e",
+  color: "#fff",
+  border: "none",
+  borderRadius: 10,
+};
+const cancelBtn = {
+  flex: 1,
+  padding: 10,
+  background: "#ef4444",
+  color: "#fff",
+  border: "none",
+  borderRadius: 10,
+};
+const servedBtn = {
+  width: "100%",
+  padding: 10,
+  background: "#3b82f6",
+  color: "#fff",
+  border: "none",
+  borderRadius: 10,
+};
+const paidBtn = {
+  width: "100%",
+  padding: 12,
+  background: "linear-gradient(135deg, #10b981, #22c55e)",
+  color: "#fff",
+  border: "none",
+  borderRadius: 12,
+  fontWeight: 700,
 };

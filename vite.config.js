@@ -5,13 +5,8 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [react()],
   server: {
-    host: "0.0.0.0",
-    port: 3000,
-    proxy: {
-      "/user": {
-        target: "http://localhost:4000",
-        changeOrigin: true,
-      },
-    },
+    host: "0.0.0.0", // CRITICAL: This allows other devices on your Wi-Fi network to see the app
+    port: 3000, // This forces the React frontend to run on port 3000
+    cors: true, // Tells Vite to allow cross-origin resource sharing during development
   },
 });
