@@ -63,7 +63,7 @@ export default function Book({ data, tableNumber, order, setOrder, bookType }) {
       order: order,
     };
     try {
-      let lien = "http://192.168.0.189:3005/orders";
+      let lien = "http://localhost:3005/orders";
       const response = await fetch(lien, {
         method: "POST",
 

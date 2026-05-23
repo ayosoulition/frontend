@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 
-const socket = io("http://192.168.0.189:3005");
+const socket = io("http://localhost:3005");
 
 export default function Ticket({
   order,
@@ -12,7 +12,7 @@ export default function Ticket({
 }) {
   const [tableStatus, setTableStatus] = useState(null);
 
-  let lien = "http://192.168.0.189:3005";
+  let lien = "http://localhost:3005";
   const keys = Object.keys(order || {});
 
   let total = 0;

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { io } from "socket.io-client";
 import "./Serveur.css";
 
-const API_BASE_URL = "http://192.168.0.189:3005";
+const API_BASE_URL = "http://localhost:3005";
 const socket = io(API_BASE_URL);
 
 export default function Serveur() {
